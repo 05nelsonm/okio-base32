@@ -3,7 +3,22 @@ package io.matthewnelson.base32
 import okio.ByteString.Companion.encodeUtf8
 import okio.internal.commonToUtf8String
 
-fun String.decodeBase32ToArray(): ByteArray? {
+sealed class Base32 {
+
+    internal abstract val encodingTable: ByteArray
+
+    object Default: Base32() {
+        override val encodingTable: ByteArray
+            get() = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".encodeUtf8().toByteArray()
+    }
+
+    object Hex: Base32() {
+        override val encodingTable: ByteArray
+            get() = "0123456789ABCDEFGHIJKLMNOPQRSTUV".encodeUtf8().toByteArray()
+    }
+}
+
+fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
     var limit: Int = length
 
     // Disregard padding and/or whitespace from end of input
@@ -95,7 +110,7 @@ fun String.decodeBase32ToArray(): ByteArray? {
     }
 }
 
-fun ByteArray.encodeBase32(): String {
+fun ByteArray.encodeBase32(type: Base32 = Base32.Default): String {
     val base32Lookup: ByteArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".encodeUtf8().toByteArray()
     val length: Long = (size.toLong() / 5L * 8L) + if (size % 5 == 0) 0L else 8L
     val out = ByteArray(length.toInt())
