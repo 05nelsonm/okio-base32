@@ -38,16 +38,42 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
     for (i in 0 until limit) {
         val bits: Long = when (val c: Char = this[i]) {
             in 'A'..'Z' -> {
-                // char ASCII value
-                //  A    65    0
-                //  Z    90    25 (ASCII - 65)
-                c.toLong() - 65L
+                when (type) {
+                    is Base32.Default -> {
+                        // char ASCII value
+                        //  A    65    0
+                        //  Z    90    25 (ASCII - 65)
+                        c.toLong() - 65L
+                    }
+                    is Base32.Hex -> {
+                        // char ASCII value
+                        //  A    65    10
+                        //  V    86    31 (ASCII - 55)
+                        c.toLong() - 55L
+                    }
+                }
             }
-            in '2'..'7' -> {
-                // char ASCII value
-                //  2    50    26
-                //  7    55    31 (ASCII - 24)
-                c.toLong() - 24L
+            in '0'..'9' -> {
+                when (type) {
+                    is Base32.Default -> {
+
+                        // Default base32 uses 2-7 only
+                        if (c == '0' || c == '1' || c == '8' || c == '9') {
+                            return null
+                        }
+
+                        // char ASCII value
+                        //  2    50    26
+                        //  7    55    31 (ASCII - 24)
+                        c.toLong() - 24L
+                    }
+                    is Base32.Hex -> {
+                        // char ASCII value
+                        //  0    48    0
+                        //  9    57    9 (ASCII - 48)
+                        c.toLong() - 48L
+                    }
+                }
             }
             '\n', '\r', ' ', '\t' -> {
                 continue
