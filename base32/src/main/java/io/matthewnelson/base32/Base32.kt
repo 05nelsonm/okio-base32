@@ -137,7 +137,7 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
 }
 
 fun ByteArray.encodeBase32(type: Base32 = Base32.Default): String {
-    val base32Lookup: ByteArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".encodeUtf8().toByteArray()
+    val base32Lookup: ByteArray = type.encodingTable
     val length: Long = (size.toLong() / 5L * 8L) + if (size % 5 == 0) 0L else 8L
     val out = ByteArray(length.toInt())
 

@@ -101,8 +101,26 @@ class Base32UnitTest {
                 randomByteArray[j] = sRandom.nextInt().toByte()
             }
 
-            randomByteArray.encodeBase32().let { okioEncoded ->
+            randomByteArray.encodeBase32(Base32.Default).let { okioEncoded ->
                 BaseEncoding.base32().encode(randomByteArray).let { guavaEncoded ->
+                    Assert.assertEquals(okioEncoded, guavaEncoded)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `Okio base32hex _encode_ matches Guava output`() {
+        for (i in 0 until testDepth) {
+            val randomByteArray = ByteArray(i)
+
+            // Build ByteArray of randomly chosen bytes
+            for (j in 0 until i) {
+                randomByteArray[j] = sRandom.nextInt().toByte()
+            }
+
+            randomByteArray.encodeBase32(Base32.Hex).let { okioEncoded ->
+                BaseEncoding.base32Hex().encode(randomByteArray).let { guavaEncoded ->
                     Assert.assertEquals(okioEncoded, guavaEncoded)
                 }
             }
