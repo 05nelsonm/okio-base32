@@ -7,6 +7,11 @@ sealed class Base32 {
 
     internal abstract val encodingTable: ByteArray
 
+    object Crockford: Base32() {
+        override val encodingTable: ByteArray
+            get() = "0123456789ABCDEFGHJKMNPQRSTVWXYZ".encodeUtf8().toByteArray()
+    }
+
     object Default: Base32() {
         override val encodingTable: ByteArray
             get() = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".encodeUtf8().toByteArray()
