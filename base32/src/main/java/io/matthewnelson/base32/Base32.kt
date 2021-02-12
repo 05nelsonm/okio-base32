@@ -53,12 +53,11 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                 when (type) {
                     is Base32.Crockford -> {
                         when (c) {
-                            'O' -> {
-                                // Crockford treats characters 'O' and 'o' as 0
-
+                            in 'A'..'H' -> {
                                 // char ASCII value
-                                //  0    48    0 (ASCII - 48)
-                                '0'.toLong() - 48L
+                                //  A    65    10
+                                //  H    72    17 (ASCII - 55)
+                                c.toLong() - 55L
                             }
                             'I', 'L' -> {
                                 // Crockford treats characters 'I', 'i', 'L' and 'l' as 1
@@ -67,17 +66,40 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                                 //  1    49    1 (ASCII - 48)
                                 '1'.toLong() - 48L
                             }
+                            'J', 'K' -> {
+                                // char ASCII value
+                                //  J    74    18
+                                //  K    75    19 (ASCII - 56)
+                                c.toLong() - 56L
+                            }
+                            'M', 'N' -> {
+                                // char ASCII value
+                                //  M    77    20
+                                //  N    78    21 (ASCII - 57)
+                                c.toLong() - 57L
+                            }
+                            'O' -> {
+                                // Crockford treats characters 'O' and 'o' as 0
+
+                                // char ASCII value
+                                //  0    48    0 (ASCII - 48)
+                                '0'.toLong() - 48L
+                            }
+                            in 'P'..'T' -> {
+                                // char ASCII value
+                                //  P    80    22
+                                //  T    84    26 (ASCII - 58)
+                                c.toLong() - 58L
+                            }
                             'U' -> {
                                 // Crockford excludes 'U' and 'u'
                                 return null
                             }
-                            else -> {
-                                // 'O', 'I', 'L' have already been filtered out
-
+                            else -> { // Remaining characters are V-Z
                                 // char ASCII value
-                                //  A    65    10
-                                //  Z    90    31 (ASCII - 55)
-                                c.toLong() - 55L
+                                //  V    86    27
+                                //  Z    90    31 (ASCII - 59)
+                                c.toLong() - 59L
                             }
                         }
                     }
