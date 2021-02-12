@@ -26,9 +26,16 @@ sealed class Base32 {
 fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
     var limit: Int = length
 
+    // If encoding type is Crockford, ensure all characters are uppercase
+    val stringToDecode: String = if (type is Base32.Crockford) {
+        this.toUpperCase()
+    } else {
+        this
+    }
+
     // Disregard padding and/or whitespace from end of input
     while (limit > 0) {
-        val c = this[limit - 1]
+        val c = stringToDecode[limit - 1]
         if (c != '=' && c != '\n' && c != '\r' && c != ' ' && c != '\t') {
             break
         }
@@ -41,9 +48,35 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
 
     var bitBuffer: Long = 0L
     for (i in 0 until limit) {
-        val bits: Long = when (val c: Char = this[i]) {
+        val bits: Long = when (val c: Char = stringToDecode[i]) {
             in 'A'..'Z' -> {
                 when (type) {
+                    is Base32.Crockford -> {
+                        when (c) {
+                            'O' -> {
+                                // Crockford treats characters 'O' and 'o' as 0
+
+                                // char ASCII value
+                                //  0    48    0 (ASCII - 48)
+                                '0'.toLong() - 48L
+                            }
+                            'I', 'L' -> {
+                                // Crockford treats characters 'I', 'i', 'L' and 'l' as 1
+
+                                // char ASCII value
+                                //  1    49    1 (ASCII - 48)
+                                '1'.toLong() - 48L
+                            }
+                            else -> {
+                                // 'O', 'I', 'L' have already been filtered out
+
+                                // char ASCII value
+                                //  A    65    10
+                                //  Z    90    31 (ASCII - 55)
+                                c.toLong() - 55L
+                            }
+                        }
+                    }
                     is Base32.Default -> {
                         // char ASCII value
                         //  A    65    0
@@ -78,6 +111,7 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                         //  7    55    31 (ASCII - 24)
                         c.toLong() - 24L
                     }
+                    is Base32.Crockford,
                     is Base32.Hex -> {
                         // char ASCII value
                         //  0    48    0
