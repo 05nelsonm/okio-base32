@@ -46,6 +46,12 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                         c.toLong() - 65L
                     }
                     is Base32.Hex -> {
+
+                        // base32Hex uses A-V only
+                        if (c in 'W'..'Z') {
+                            return null
+                        }
+
                         // char ASCII value
                         //  A    65    10
                         //  V    86    31 (ASCII - 55)
@@ -58,7 +64,7 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                     is Base32.Default -> {
 
                         // Default base32 uses 2-7 only
-                        if (c == '0' || c == '1' || c == '8' || c == '9') {
+                        if (c in '0'..'1' || c in '8'..'9') {
                             return null
                         }
 
