@@ -67,6 +67,10 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                                 //  1    49    1 (ASCII - 48)
                                 '1'.toLong() - 48L
                             }
+                            'U' -> {
+                                // Crockford excludes 'U' and 'u'
+                                return null
+                            }
                             else -> {
                                 // 'O', 'I', 'L' have already been filtered out
 
