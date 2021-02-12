@@ -128,6 +128,11 @@ fun String.decodeBase32ToArray(type: Base32 = Base32.Default): ByteArray? {
                 continue
             }
             else -> {
+                // Crockford allows insertion of hyphens which we ignore when decoding
+                if (type is Base32.Crockford && c == '-') {
+                    continue
+                }
+
                 return null
             }
         }
